@@ -1,0 +1,131 @@
+import { useAnimatedValue,Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, {useCallback,memo, useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+import {MyStorage} from './StorageCon'; 
+import {MyInGameStor} from '../gameData/InGameStorage'; 
+
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+const QuestionBox = () =>{
+
+    const {ingameQues,setingameQues}=useContext(MyInGameStor)
+
+
+    //animation toggle
+
+    const {isAnswerAcceptable,setisAnswerAcceptable}=useContext(MyInGameStor)
+   const {categoryFilter,setcategoryFilter}=useContext(MyInGameStor); 
+    //animation timing
+
+    //animation response style.........
+
+    const {quesBoxResponseStyle}=useContext(MyInGameStor)
+
+    return(
+        <>
+
+        <Animated.View style = {[styles.quesboxcon ,quesBoxResponseStyle]}>
+            <View style = {styles.quespanel}>
+                <Text style = {{fontSize:18,fontWeight:'bold',color:'white'}}>{categoryFilter}</Text>
+            </View>
+            <View style = {styles.quespadd}>
+            
+            <ScrollView contentContainerstyle = {{width:'100%',alignItems:'center'}}>
+            {/* generate question text */}
+          {/* <Text style = {styles.question}>{[isAnswerAcceptable === true ? "CORRECT" : isAnswerAcceptable === false ? "INCORRECT":ingameQues?.question]}</Text>   */}
+
+       <View>{isAnswerAcceptable === true ? 
+       <>
+        <Image style = {styles.resultimg} source={require('../assets/projectlogo.png')}/>
+          <Text style = {styles.resultText}>CORRECT</Text>
+          </>
+           :
+           isAnswerAcceptable === false
+           ?
+           <>
+        <Image style = {styles.resultimg} source={require('../assets/crying.jpg')}/>
+          <Text style = {styles.resultText}>INCORRECT</Text>
+          </>
+          :
+         <Text style = {styles.question}>{ingameQues?.question}</Text>
+          }</View> 
+             
+          
+
+
+            </ScrollView>
+            </View>
+        </Animated.View>
+
+        
+        </>
+    );
+};
+
+const styles = StyleSheet.create({
+
+
+    quesboxcon:{
+        // backgroundColor:'white',
+        width:wp('85%'),
+        // height:170,
+        height:hp('24%'),
+        position:'absolute',
+        top:100,
+        left:hp('3%'),
+        borderRadius:20
+    },
+    quesboxconcorrect:{
+        backgroundColor:'green',
+        width:'85%',
+        height:170,
+        position:'absolute',
+        top:100,
+        left:30,
+        borderRadius:20
+    },
+
+    quesboxconwrong:{
+        backgroundColor:'red',
+        width:'85%',
+        height:170,
+        position:'absolute',
+        top:100,
+        left:30,
+        borderRadius:20
+    },
+    quespanel:{
+
+        width:150,
+        height:30,
+        backgroundColor:'blue',
+        borderRadius:20,
+        alignContent:'center',
+        alignItems:'center',
+        paddingTop:2,
+
+    },
+    quespadd:{
+        width:'85%',
+       height:hp('18%'),
+        borderWidth:2,
+        top:10,
+        left:25,
+        alignItems:'center'
+    },
+    question:{
+        fontSize:17,
+        fontFamily: 'Cochin'
+    },
+    resultText:{
+        fontSize:30
+    },
+    resultimg:{
+        width:90,
+        height:90,
+        left:20
+    }
+})
+
+
+
+export default memo(QuestionBox);

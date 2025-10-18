@@ -1,0 +1,1315 @@
+import {Easing,Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View, KeyboardAvoidingView } from 'react-native';
+import React, { useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+import {MyStorage} from './StorageCon'; 
+import axios from 'axios'
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import firebase from '@react-native-firebase/app'
+import firestore from '@react-native-firebase/firestore'
+import uuid from 'react-native-uuid';
+import SoundPlayer from "react-native-sound-player";
+import { Picker } from '@react-native-picker/picker';
+
+// require("dotenv").config();
+
+
+
+const TitlescreenPage=({navigation})=>{
+
+  //test firebase access
+
+useEffect(()=>{
+  console.log('Firebase Access',firebase.apps.length)
+})
+
+ 
+   //enable looping bg audio toggler
+  //  const audioBgFile = require('../assets/sounds/clickedIn.mp3');
+  // //  const [Bgsound, setBgSound] = useState(null)
+  //  const [enablebgAudio,setenablebgAudio]=useState(false)
+  // const [isBgMusicLoaded, setisBgMusicLoaded] = useState(false);
+  //bg music play
+  //  useEffect(()=>{
+
+  //   const snd = new SoundPlayer(audioBgFile,(error) =>{
+  //     if(error){
+  //        console.log('Failed to load the sound', error);
+  //       Alert.alert('Error', 'Failed to load audio. Make sure the file exists and is correctly linked.');
+  //       setisBgMusicLoaded(false)
+  //       return;
+  //     }
+
+  //      console.log('Sound loaded successfully');
+  //     setIsLoaded(true);
+  //     setBgSound(s);
+
+  //      s.setNumberOfLoops(-1);
+
+  //       return () => {
+  //     if (s) {
+  //       console.log('Releasing sound resources.');
+  //       s.stop(() => { // Stop before releasing
+  //         s.release();
+  //       });
+  //     }
+  //   };
+  //   })
+  //  },[])
+
+  //    const playBgSound = () => {
+  //   if (Bgsound && isLoaded) {
+  //     Bgsound.play((success) => {
+  //       if (success) {
+  //         console.log('Successfully finished playing');
+  //       } else {
+  //         console.log('Playback failed due to audio decoding errors');
+  //         Bgsound.reset(); // Reset the sound to try playing again
+  //       }
+  //       setIsPlaying(false); // Set to false when playback stops (if not looping)
+  //     });
+  //     setIsPlaying(true);
+  //   } else {
+  //     Alert.alert('Error', 'Sound not loaded yet or an error occurred.');
+  //   }
+  // };
+
+  
+    const { width: screenWidth } = Dimensions.get('window');
+
+    const [isSignup,setisSignup]=useState(false); //signup module activator
+    const [settingsProf,setsettingsProf]=useState(false); //settings module activator
+
+    //netweork ip address getter
+
+
+    //useState
+
+    const [unameHold,setunameHold]=useState("");
+    const [fnameHold,setfnameHold]=useState("");
+    const [lnameHold,setlnameHold]=useState("");
+    const [schoolidHold,setschoolidHold]=useState(0);
+    const [sectionHold,setsectionHold]=useState("");
+    const [gradelevelHold,setgradelevelHold]=useState(0);
+    const [passHold,setpassHold]=useState("");
+    const [repassHold,setrepassHold]=useState("");
+
+    const [logunameHold,setlogunameHold]=useState("");
+    const [logpassHold,setlogpassHold]=useState("");
+
+    //context state
+
+    const {studProfile,setstudProfile}=useContext(MyStorage)
+
+
+    const {editunameHold,seteditunameHold}=useContext(MyStorage)
+    const {editfnameHold,seteditfnameHold}=useContext(MyStorage)
+    const {editlnameHold,seteditlnameHold}=useContext(MyStorage)
+    const {editschoolidHold,seteditschoolidHold}=useContext(MyStorage)
+    const {editsectionHold,seteditsectionHold}=useContext(MyStorage)
+    const {editgradelevelHold,seteditgradelevelHold}=useContext(MyStorage)
+    const {editcurrpassHold,seteditcurrpassHold}=useContext(MyStorage)
+    const {editnewpassHold,seteditnewpassHold}=useContext(MyStorage)
+    const {editretypepassHold,seteditretypepassHold}=useContext(MyStorage)
+
+    useEffect(()=>{
+
+       setsettingsProf(false)
+        setprofileBox(false)
+         setisLogSignFaderesize(true)
+          setisbgMoveWidthLeft(false)
+           setisbgMoveHeightTop(false)
+
+    },[])
+
+    //response design state
+
+    
+    const {profileBox,setprofileBox}=useContext(MyStorage); //profile box response
+
+    //animation and useState toggle ------------------------------------
+       const [LoadingBox,setLoadingBox]=useState(true); //for loading iconbox toggle
+
+
+       //for logSign Panel references
+       const fadelogSign = useRef(new Animated.Value(0)).current;
+       const logSignCloseOpenWidth =useRef(new Animated.Value(0)).current;
+        const logSignCloseOpenHeight =useRef(new Animated.Value(0)).current;
+       const {isLogSignvisible,setisLogSignvisible}=useContext(MyStorage);
+       const {isLogSignFaderesize,setisLogSignFaderesize}=useContext(MyStorage);
+
+       //for dropown settings button references
+
+       const [iconsetting1]=useState(new Animated.Value(0));
+       const [iconsetting2]=useState(new Animated.Value(0));
+       const [iconsetting3]=useState(new Animated.Value(0));
+       const [openSettings,setopenSettings]=useState(false);
+
+       //for manipulating bg title references
+
+       const bgtitleWidthmove = useRef(new Animated.Value(0)).current;
+       const bgtitleLeftmove = useRef(new Animated.Value(0)).current;
+       const bgtitleHeightmove = useRef(new Animated.Value(0)).current;
+      const bgtitleTopmove = useRef(new Animated.Value(0)).current;
+
+      const {isbgMoveWidthLeft,setisbgMoveWidthLeft}=useContext(MyStorage);
+      const {isbgMoveHeightTop,setisbgMoveHeightTop}=useContext(MyStorage);
+
+      const [loginButtonLoad,setloginButtonLoad]=useState(false)  //for disable button/s for while after clicking it
+
+       //animation timing--------------------------------
+
+    //logSignfade*******************
+          useEffect(()=>{  
+
+            if(isLogSignvisible){
+
+              Animated.timing(fadelogSign, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }).start(()=>{
+            // setisbgMoveWidthLeft(true)
+          });
+
+            }
+
+          },[isLogSignvisible,fadelogSign])
+
+
+         //logSignfadeRsize**********************
+       useEffect(()=>{   
+        if(isLogSignFaderesize){
+          Animated.parallel([
+
+          Animated.timing(logSignCloseOpenWidth,{
+
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+
+          }),
+
+           Animated.timing(logSignCloseOpenHeight,{
+
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+
+          })
+
+          ]).start(()=>{
+            setisLogSignvisible(true)
+          });
+        }
+
+        else{
+
+            Animated.parallel([
+
+          Animated.timing(logSignCloseOpenWidth,{
+
+        toValue: 0,
+        duration: 700,
+        useNativeDriver: true,
+       
+
+          }),
+
+           Animated.timing(logSignCloseOpenHeight,{
+
+        toValue: 0,
+        duration: 700,
+        useNativeDriver: true,
+    
+
+          })
+
+          ]).start(()=>{
+            setisLogSignvisible(false)   //fade out logsign panel 
+            setisbgMoveWidthLeft(true)  //set bg animation to true
+            // setisbgMoveHeightTop(true)
+            SoundPlayer.playAsset(require("../assets/sounds/interface-11.mp3"))
+
+          });
+
+        
+
+          
+
+        }
+       },[logSignCloseOpenHeight,logSignCloseOpenWidth,isLogSignFaderesize])
+
+      const LogSignResizeStyle = {
+        transform: [
+      { scaleX: logSignCloseOpenWidth },
+      { scaleY: logSignCloseOpenHeight },
+     ],
+
+         width:wp('100%'),
+        height:hp('30%')
+       }
+
+        
+
+
+       const LogSignFadeStyle = {
+        opacity: fadelogSign,
+       }
+         //manipulate title bg***********************
+
+         //title bg go left resize width
+         useEffect(()=>{
+
+          if(isbgMoveWidthLeft){
+            // console.log("Moving bg")
+
+               Animated.parallel([
+
+          Animated.timing(bgtitleWidthmove,{
+
+        toValue: 0.9,
+        duration: 200,
+        useNativeDriver: true,
+        easing: Easing.easeInBack,
+       
+
+          }),
+
+           Animated.timing(bgtitleLeftmove,{
+
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+        easing: Easing.easeInBack,
+    
+
+          }),
+          
+          ]).start(()=>{
+            setisbgMoveHeightTop(true)
+            SoundPlayer.playAsset(require("../assets/sounds/interface-15.mp3"))
+          });
+          }
+
+          else{
+
+             Animated.parallel([
+
+          Animated.timing(bgtitleWidthmove,{
+
+        toValue:1,
+        duration: 200,
+        useNativeDriver: true,
+       
+
+          }),
+
+           Animated.timing(bgtitleLeftmove,{
+
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+    
+
+          })
+
+          ]).start(()=>{
+          
+          });
+
+
+          }
+
+         },[isbgMoveWidthLeft,bgtitleWidthmove,bgtitleLeftmove]);
+
+         
+              //title bg go top resize height
+
+
+        useEffect(()=>{
+
+          if(!isbgMoveHeightTop){
+
+              Animated.parallel([
+
+          Animated.timing(bgtitleHeightmove,{
+
+        toValue:1,
+        duration: 200,
+        useNativeDriver: true,
+       
+
+          }),
+
+           Animated.timing(bgtitleTopmove,{
+
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+    
+
+          })
+
+          ]).start(()=>{
+           
+          });
+
+          }
+
+          else{
+              Animated.parallel([
+
+          Animated.timing(bgtitleHeightmove,{
+
+        toValue:1,
+        duration: 200,
+        useNativeDriver: true,
+       
+
+          }),
+
+           Animated.timing(bgtitleTopmove,{
+
+        toValue: 70,
+        duration: 200,
+        useNativeDriver: true,
+    
+
+          })
+
+          ]).start(()=>{
+           
+          });
+
+          }
+
+        },[bgtitleHeightmove,bgtitleTopmove,isbgMoveHeightTop])
+
+        //bg style
+          const bgtitleStyle = {
+            transform:[
+              {scaleY:bgtitleHeightmove},
+            {translateY:bgtitleTopmove},
+             {scaleX:bgtitleWidthmove},
+            {translateX:bgtitleLeftmove},
+          ],
+
+            height:hp('37%'),
+            top:0,
+            width: wp('100%'),
+            left: 0,
+            
+         }
+
+         //dropown settings animat***********************
+
+          const openSettingsToggle = () =>{
+
+            setopenSettings(true)
+            Animated.timing(iconsetting1,{
+              toValue:wp('25%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+            Animated.timing(iconsetting2,{
+              toValue:wp('50%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+            Animated.timing(iconsetting3,{
+              toValue:wp('75%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+          }
+
+             const closeSettingsToggle = () =>{
+
+            setopenSettings(false)
+            Animated.timing(iconsetting1,{
+              toValue:wp('0%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+            Animated.timing(iconsetting2,{
+              toValue:wp('0%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+            Animated.timing(iconsetting3,{
+              toValue:wp('0%'),
+              duration:500,
+              useNativeDriver:true
+            }).start();
+
+          }
+
+            const dropdownStyle1 = {
+        transform: [{ translateX: iconsetting1 }]
+       }
+        const dropdownStyle2 = {
+        transform: [{ translateX: iconsetting2 }]
+       }
+        const dropdownStyle3 = {
+        transform: [{ translateX: iconsetting3 }]
+       }
+
+     
+
+
+
+    //functions.....
+
+    //edit profile pending func
+
+    const editPend=()=>{
+
+       SoundPlayer.playAsset(require("../assets/sounds/clickedIn.mp3"))
+      
+        // set edit pend
+       
+        seteditunameHold(studProfile.username)
+        seteditfnameHold(studProfile.firstname)
+        seteditlnameHold(studProfile.lastname)
+        seteditschoolidHold(String(studProfile.studentID))
+        seteditsectionHold(studProfile.section)
+        seteditgradelevelHold(String(studProfile.gradelevel))
+
+
+
+       navigation.navigate('editprofile')
+        setsettingsProf(false)
+
+        // console.log("ojke")
+     
+    }
+
+          
+
+    //signup 
+    const SignupFunc=async()=>{
+
+       SoundPlayer.playAsset(require("../assets/sounds/clickedIn.mp3"))
+
+      if(unameHold.length <= 12){ //username limitation if
+
+        // if(gradelevelHold <= 6 && gradelevelHold >=1){//grade level limitation if
+
+          if(passHold === repassHold){//password comparison if
+
+            if(unameHold!=="" && fnameHold!=="" && lnameHold!=="" && schoolidHold!==0  && passHold!=="" && repassHold!==""){ //not equal blank if
+
+              //maybe next time
+
+
+                   //apply signup now
+          //     const SignupInfo={
+          //     username:unameHold,
+          //     firstname:fnameHold,
+          //     lastname:lnameHold,
+          //     schoolID:schoolidHold,
+          //     section:sectionHold,
+          //     gradelevel:gradelevelHold,
+          //     password:passHold
+          // }
+
+      //check if studentid exist
+
+      const studentidlist = firestore().collection('studentid-list')
+      const getstudentid = await studentidlist
+      .where('studentid','==',Number(schoolidHold))
+      .get()
+
+      const searchstudentid = getstudentid.docs.map(doc=>({
+        ...doc.data(),
+        id:doc.id
+      }))
+
+      if(searchstudentid.length <= 0){
+
+        Alert.alert("Not found","student id not registered")
+        return
+      }
+
+      //check if username exist
+
+      const studentdblist = firestore().collection('students')
+      const getstudent = await studentdblist
+      .where('username','==',unameHold)
+      .get()
+
+      const searchstudent = getstudent.docs.map((doc)=>({
+        id:doc.id,
+        ...doc.data()
+      }))
+
+      if(searchstudent.length > 0){
+          Alert.alert("found","Username Exist")
+          return
+      }
+
+      //firebase add profile
+
+      firestore()
+      .collection('students').doc(uuid.v4())
+      .set({
+        username:unameHold,
+        firstname:fnameHold,
+        lastname:lnameHold,
+        password:passHold,
+        studentID:Number(schoolidHold),
+        // section:sectionHold,
+        gradelevel:Number(gradelevelHold)
+
+      })
+      .then(()=>{
+       Alert.alert(
+        "Success",
+        "Account Added"
+       )
+       setisSignup(false)
+      })
+
+      //firebase add player-assets
+      const defaultavatar = "http://www.avatarsinpixels.com/minipix/eyJFeWVzIjoiMiIsIk1vdXRoIjoiNyIsIlNvY2tzIjoiMSIsIlNob2VzIjoiMyIsIlBhbnRzIjoiMyIsIlRvcCI6IjEzIiwiSmFja2V0IjoiNiIsIk5lY2siOiIzIiwiSGFpciI6IjMifQ==/1/show.png"
+      const defaultmedallion = "https://cdn.pixabay.com/photo/2014/12/21/23/25/plaque-575318_640.png"
+      firestore()
+      .collection('player-assets').doc(uuid.v4())
+      .set({
+        characterequipimg:defaultavatar,
+        coins:100,
+        medallionequipimg:defaultmedallion,
+        studentid:Number(schoolidHold),
+        titleequiptext:"Beginner",
+      })
+    
+
+            }
+
+            else{ //not equal blank else
+
+              Alert.alert(
+                'Invalid',
+                'Fill all the required fields'
+              )
+              
+            }
+
+           
+          }
+
+          else{//password comparison else
+
+            Alert.alert(
+              'Invalid',
+              'Password not matched'
+            )
+
+          }
+
+        // }
+
+        // else{ //grade level limitation else
+        //   Alert.alert(
+        //     'Invalid',
+        //     'Invalid Level. The level might not be supported from this app'
+        //   )
+        // }
+
+      }
+      else{ //username limitation else
+
+        Alert.alert(
+          'Invalid',
+          'Character Limit Reached (Max.12)'
+        )
+
+      }
+
+       
+    }
+
+
+ 
+
+
+      
+    //login function
+
+    const  LoginFunc= async ()=>{
+
+      SoundPlayer.playAsset(require("../assets/sounds/clickedIn.mp3"))
+     
+      try{
+
+        setloginButtonLoad(true)
+      //firebase look for student------------------
+
+      //find account
+     
+        const studentdblist = firestore().collection('students');
+        const getstud = await studentdblist 
+        .where('username','==',logunameHold)
+        .where('password', "==",logpassHold)
+        .limit(1)
+        .get()
+        
+       
+        
+        
+   
+        const searchstud = getstud.docs.map(doc=>({
+         ...doc.data(),
+         uid:doc.id  //get stud document id
+        }))
+   
+    
+
+ 
+     if(!getstud.empty){ //password and username validation
+ //put it to active profile
+     const convertstud={
+   
+       uid:searchstud[0].uid,
+       username:searchstud[0].username,
+       firstname:searchstud[0].firstname,
+       lastname:searchstud[0].lastname,
+       studentID:Number(searchstud[0].studentID),
+       gradelevel:searchstud[0].gradelevel,
+       section:searchstud[0].section,
+       password:searchstud[0].password,
+   
+     }
+        // setisLogSignvisible(false) 
+        setstudProfile(convertstud)
+        setprofileBox(true)
+        setLoadingBox(false)
+        setisLogSignFaderesize(false)
+        
+
+    }
+
+    else{
+      setLoadingBox(false)
+      Alert.alert(
+        "Error",
+        "Invald Username or Password"
+      )
+      setisLogSignFaderesize(true)
+    }
+ 
+   
+
+    }
+
+    catch(e){
+      console.log(e)
+    }
+
+    finally{
+      setloginButtonLoad(false)
+    }
+
+    }
+ 
+
+
+    //delete acc
+    const deleteAccFunc=()=>{
+      // 
+       SoundPlayer.playAsset(require("../assets/sounds/clickedIn.mp3"))
+    }
+
+    return(
+        <>
+
+        <ImageBackground source={require('../assets/learneng_bg.png')} style={styles.container}>
+{/* 
+        <View style = {[LoadingBox ? styles.loadingbox : styles.loadingboxhide]}>
+        <Text style = {{
+          color:'white',
+          fontSize:15,
+          fontWeight:900
+        }}>LOADING</Text>
+        </View> */}
+
+       
+
+        {/* Signup modal */}
+        <Modal
+        transparent={true}
+        visible={isSignup}
+        animationType='fade'
+        onRequestClose={()=>setisSignup(false)}
+        >
+
+      
+       
+        <KeyboardAvoidingView style = {styles.signupcon}
+         behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+        >
+
+        
+
+        <View style = {styles.tfsigncon}>
+ 
+         <TextInput 
+           style = {styles.signuptf}
+          placeholder='Firstname'
+          placeholderTextColor="black" 
+        onChangeText={(text)=>setfnameHold(text)}
+        ></TextInput>
+
+          <TextInput 
+           style = {styles.signuptf}
+          placeholder='Lastname'
+          placeholderTextColor="black" 
+        onChangeText={(text)=>setlnameHold(text)}
+        ></TextInput>
+
+        <TextInput 
+           style = {styles.signuptf}
+          placeholder='Username'
+          placeholderTextColor="black" 
+        onChangeText={(text)=>setunameHold((text))}
+        ></TextInput>
+
+
+        <TextInput 
+           style = {styles.signuptf}
+          placeholder='School id'
+          placeholderTextColor="black" 
+             keyboardType="numeric"
+        onChangeText={(text)=>setschoolidHold(text)}
+        ></TextInput>
+{/* 
+        <TextInput 
+           style = {styles.signuptf}
+          placeholder='Section'
+          placeholderTextColor="black" 
+        onChangeText={(text)=>setsectionHold(text)}
+        ></TextInput> */}
+
+        <TextInput 
+           style = {styles.signuptf}
+          placeholder='grade level'
+          placeholderTextColor="black" 
+             keyboardType="numeric"
+        onChangeText={(text)=>setgradelevelHold(text)}
+        ></TextInput>
+
+
+          <TextInput 
+           style = {styles.signuptf}
+          placeholder='Password'
+          placeholderTextColor="black" 
+          secureTextEntry={true}
+        onChangeText={(text)=>setpassHold(text)}
+        ></TextInput>
+
+        <TextInput 
+           style = {styles.signuptf}
+          placeholder='Re-Type Password'
+          placeholderTextColor="black" 
+        secureTextEntry={true}
+        onChangeText={(text)=>setrepassHold(text)}
+        ></TextInput>
+
+        <Pressable
+        style = {{
+        width:100,height:50,backgroundColor:'white',borderRadius:8,
+        alignItems:'center',
+        paddingTop:15
+        }}
+        onPress={SignupFunc}
+        >
+        <Text style = {{fontWeight:'bold'}}>Signup</Text>
+        </Pressable>
+
+        </View>
+
+         
+
+
+        
+  {/* style = {{top:hp('20%'),left:wp('20%'),color:'white',fontSize:20,  textDecorationLine: 'underline'}} */}
+
+        </KeyboardAvoidingView>
+
+        <Pressable
+        style = {{width:wp('50%'),height:hp('5%'),top:hp('20%'),left:wp('25%'),color:'white',backgroundColor:'lightblue'}}
+          onPress={()=>navigation.navigate('termscondition')}
+          >
+            <Text style = {{left:7,top:5,fontSize:16,  textDecorationLine: 'underline'}}>Read terms and condition</Text>
+          </Pressable>
+
+          {/* shadow box */}
+          <TouchableWithoutFeedback   
+        onPress={()=>{
+            setisSignup(false)
+        }}
+        >
+           <ImageBackground style = {styles.signupshadow}></ImageBackground>
+        </TouchableWithoutFeedback>
+        
+
+        </Modal>
+
+        {/* login */}
+
+        {/* <Image style = {styles.backgroundimg}
+        source={{uri:'https://cdn-front.freepik.com/images/ai/image-generator/gallery/resource-tti-10.webp'}}
+        /> */}
+        
+        {/* titlepanel ------------------------------------*/}
+       {/* <Animated.View style = {[styles.titlecon,bgtitleStyle]}>
+
+       <ImageBackground style ={styles.backgroundimg}
+        source={require('../assets/nightblue_bg.png')}> 
+       
+      
+         </ImageBackground> 
+
+       </Animated.View> */}
+
+
+       
+   {/* <Animated.View style = {[profileBox ? styles.boxsignlogHide : styles.boxsignlog,LogSignStyle]}></Animated.View> */}
+       <Animated.View style = {[styles.boxsignlog,LogSignFadeStyle,LogSignResizeStyle]}>
+
+       <Text style = {[{fontSize:30,fontWeight:'bold',color:'black'}]}>LOGIN</Text>
+
+      
+       <TextInput
+        style = {isLogSignvisible ? styles.unametf : {opacity:0}}
+          placeholder='Username'
+          placeholderTextColor="black"
+        onChangeText={(text)=>setlogunameHold(text)}
+       />
+   
+
+         <TextInput
+        style = {isLogSignvisible ? styles.passtf : {opacity:0}}
+        placeholder='Password'
+        placeholderTextColor="black"
+        secureTextEntry={true}
+        onChangeText={(text)=>setlogpassHold(text)}
+       />
+
+              
+           <TouchableOpacity 
+          style = {!loginButtonLoad ? styles.loginbtn : [styles.loginbtn,{backgroundColor:'gray'}]}
+          disabled={loginButtonLoad}
+          onPress={()=>{LoginFunc()
+          setLoadingBox(true)
+          }}>  
+
+          <Text style = {{fontSize:15,fontWeight:'500'}}>LOGIN</Text>
+          </TouchableOpacity>
+
+          <View style = {styles.dontaccflex}>
+          <Text style={{color:'white',fontSize:15,fontWeight:'600'}}>Dont Have an Account</Text>
+          <Pressable
+          onPress={()=>setisSignup(true)}
+          >
+            <Text style = {{color:'white',  textDecorationLine: 'underline'}}>SIGNUP</Text>
+          </Pressable>
+          </View>
+       </Animated.View>
+
+
+        {/* start button */}
+       
+       <TouchableOpacity style = {!isLogSignvisible?{
+        width:150,height:50,left:wp('30%'),top:hp('49%'),
+        backgroundColor:'white',alignItems:'center',
+        paddingTop:13,borderRadius:20,position:'absolute',
+        borderWidth:2,borderColor:'blue'
+      }:''}
+      onPress={()=>{navigation.navigate('mainscreen')
+       SoundPlayer.playAsset(require("../assets/sounds/clickedIn.mp3"))
+      }}
+      >
+       { !isLogSignvisible? <Text style = {{fontWeight:'900'}}>START</Text> : ''}
+        
+      </TouchableOpacity> 
+       
+
+         
+
+      {/* User Logged Display */}
+      <View style = {profileBox ? styles.userloggeddis : styles.userloggeddisHide}>
+
+      
+      <View
+      style = {styles.userloggedbox}
+      >
+      <View style={styles.useloggedinfo}>
+      <Text style = {{color:'black',fontWeight:'bold',fontSize:18}}>{studProfile.username}</Text>
+      {/* <Text style = {{color:'black',fontSize:16,position:'relative'}}>Section: {studProfile.section}</Text> */}
+      </View>
+
+      
+
+      </View>
+
+      </View>
+
+     
+   {/* settings */}
+
+      {/* <View style = {!isLogSignvisible? styles.dropdownbtncon :''}>
+
+     <Animated.View style = {!isLogSignvisible? [styles.dropdownbtnbox,dropdownStyle1]: ''}>
+      <TouchableOpacity style = {!isLogSignvisible? styles.dropdownbtn : ''}
+      onPress={editPend}
+      >
+
+      </TouchableOpacity>
+      {!isLogSignvisible? openSettings ? <Text>Edit Profile</Text> : '' : ''}
+     </Animated.View>
+
+        <Animated.View style = {!isLogSignvisible? [styles.dropdownbtnbox,dropdownStyle2]: ''}>
+      <TouchableOpacity style = {!isLogSignvisible? styles.dropdownbtn : ''}
+      onPress={deleteAccFunc}
+      >
+
+      </TouchableOpacity>
+       {!isLogSignvisible? openSettings ? <Text>Delete Acc</Text> : '' : ''}
+     </Animated.View>
+
+        <Animated.View style = {!isLogSignvisible? [styles.dropdownbtnbox,dropdownStyle3]: ''}>
+      <TouchableOpacity style = {!isLogSignvisible? styles.dropdownbtn : ''}
+      onPress={()=>{
+        setsettingsProf(false)
+        setprofileBox(false)
+         setisLogSignFaderesize(true)
+          setisbgMoveWidthLeft(false)
+           setisbgMoveHeightTop(false)
+           SoundPlayer.playAsset(require("../assets/sounds/clickedOut.mp3"))
+      }}
+      >
+
+      </TouchableOpacity>
+       {!isLogSignvisible? openSettings ? <Text>Logout</Text> : '':''}
+     </Animated.View>
+     
+     <View style = {!isLogSignvisible? [styles.dropdownbtnbox,{zIndex:1}] :''}>
+      <TouchableOpacity style = {!isLogSignvisible? styles.dropdownbtn : ''}
+      onPress={()=>{
+        openSettings === false ? openSettingsToggle() : closeSettingsToggle();
+        console.log("qwer")
+        SoundPlayer.playAsset(require("../assets/sounds/settings-sweep.mp3"))
+      }}
+      >
+      </TouchableOpacity>
+      {!isLogSignvisible? <Text>Settings</Text> : ''}
+     </View>
+
+      </View> */}
+
+        </ImageBackground>
+
+        </>
+    );
+};
+
+
+
+const styles = StyleSheet.create({
+    container:{
+        flex: 1,
+        backgroundColor: '#fff',
+        // alignItems: 'center',
+        // justifyContent: 'center',
+        backgroundColor:'#4483E4'
+
+    },
+
+    loadingbox:{
+      width:wp('35%'),
+      height:30,
+      backgroundColor:'darkblue',
+      borderWidth:2,
+      borderRadius:10,
+      borderColor:'white',
+      position:'absolute',
+      left:wp('63%'),
+      top:hp('1%'),
+      zIndex:1,
+      alignItems:'center',
+      paddingTop:4,
+      display:'flex'
+   
+
+    },
+
+    loadingboxhide:{
+
+      display:'none'
+   
+
+    },
+
+    backgroundimg:{
+        width:'100%',
+        height:'100%',
+        position:'absolute',
+         borderRadius:10,
+    },
+
+    titlecon:{
+        // width:wp('100%'),
+        // height:hp('37%'),
+        borderBottomWidth:3,
+        flexDirection:'row',
+        alignItems:'center',
+        alignContent:'center',
+        // columnGap:50,
+        borderWidth:3,
+        borderRadius:10,
+        borderColor:'white',
+        // left:20,
+        // top:20,
+        // width:wp('90%'),
+        // height:hp('63%'),
+       
+       
+    },
+
+    title:{
+
+        fontWeight:'bold',
+        fontSize:23,
+    //     background:linear-gradient(to right, red, blue),
+    // background-clip: text,
+    // color: transparent,
+
+
+    },
+    logoicon:{
+        width:50,
+        height:50
+    },
+
+
+
+    boxsignlog:{
+
+        // width:'100%',
+        // height:11,
+        position:'absolute',
+        top:hp('37%'),
+        alignContent:'center',
+        alignItems:'center',
+        backgroundColor:'lightgreen',
+        padding:20,
+        rowGap:20,
+        borderStyle:'dotted',
+        borderWidth:2,
+        borderColor:'white'
+        
+
+
+    },
+
+    boxsignlogHide:{
+
+       display:'none' 
+
+
+    },
+
+    unametf:{
+        width:200,
+        borderWidth:2,
+        borderRadius:10,
+        borderColor:'black',
+        color:'black',
+        backgroundColor:'white'
+
+    },
+    passtf:{
+        width:200,
+        borderWidth:2,
+        borderRadius:10,
+        borderColor:'black',
+        color:'black',
+           backgroundColor:'white'
+
+    },
+    loginbtn:{
+        width:200,
+        height:50,
+        backgroundColor:'lightblue',
+        borderRadius:20,
+        alignContent:'center',
+        alignItems:'center',
+        paddingTop:15,
+        bottom:hp('0.5%')
+    },
+    dontaccflex:{
+        flexDirection:'row',
+        columnGap:15,
+    },
+
+    // modal
+
+    signupcon:{
+
+        width:wp('85%'),
+        height:hp('auto'),
+        backgroundColor:'lightgreen',
+        position:'relative',
+        top:'8%',
+        left:'8%',
+        borderColor:'white',
+        borderWidth:3
+
+
+    },
+
+
+    tfsigncon:{
+        width:'100%',
+        height:'auto',
+        position:'relative',
+        top:10,
+        alignContent:'center',
+        alignItems:'center',
+        rowGap:10,
+        
+    },
+
+    signuptf:{
+
+        width:'80%',
+        borderWidth:2,
+        borderRadius:10,
+        borderColor:'black',
+        backgroundColor:'white',
+        color:'blue'
+
+    },
+    signupshadow:{
+        width:'100%',
+        height:hp('110%'),
+        backgroundColor: 'black',
+        opacity: 0.7,
+        elevation:10,
+        zIndex:-1,
+        bottom:hp('60%')
+
+        
+    },
+    userloggeddis:{
+        width:wp('100%'),
+        height:'auto',
+        flexDirection:'row',
+        flexWrap:'wrap-reverse',
+        // borderWidth:3,
+        // alignItems:'center',
+        position:'absolute',
+        top:wp('145%'),
+       
+    },
+    userloggeddisHide:{
+        
+       display:'none'
+    },
+    userloggedbox:{
+        width:wp('60%'),
+        height:hp('9%'),
+        // borderWidth:2,
+        borderWidth:2,
+        borderRadius:20,
+        borderColor:'black',
+        backgroundColor:'white',
+        alignItems:'center',
+        // position:'absolute',
+        alignContent:'center',
+        // top:hp('12%'),
+        left:wp('18%'),
+        
+        
+    },
+    profsettings:{
+        position:'relative',
+        left:90,
+        top:10,
+        width:50,
+        height:50,
+        borderRadius:12,
+        backgroundColor:'darkblue',
+        alignItems:'center'
+    },
+    settingscon:{
+        width:150,
+        height:200,
+        backgroundColor:'#5c52ce',
+        position:'relative',
+        top:200,
+        left:200,
+        alignItems:'center',
+        borderWidth:2,
+        borderStyle:'dashed',
+        borderColor:'white'
+    },
+    loggedclickbox:{
+      width:'100%',
+      height:'100%',
+      backgroundColor:'black',
+      opacity:0.7,
+      elevation:10,
+      zIndex:1
+    },
+    setmodbtn:{
+      width:120,
+      height:40,
+      borderRadius:20,
+      backgroundColor:'lightblue',
+      marginTop:10,
+      alignItems:'center',
+      paddingTop:10,
+    
+    },
+
+    dropdownbtncon:{
+      width:wp('100%'),
+      height:hp('10%'),
+      borderWidth:2,
+      top:hp('78%'),
+      flexDirection:'row',
+      position:'absolute'
+
+      
+    },
+    dropdownbtnbox:{
+
+      width:'auto',
+      height:'auto',
+      alignContent:'center',
+      alignItems:'center',
+      position:'absolute',
+      left:20
+
+    },
+    dropdownbtn:{
+      width:60,
+      height:60,
+      borderRadius:30,
+      backgroundColor:'red',
+   
+    }
+
+  
+})
+
+
+
+export default TitlescreenPage;

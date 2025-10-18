@@ -1,0 +1,330 @@
+import {Easing,BackHandler,useAnimatedValue,Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, { memo,useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+// import {MyStorage} from './StorageCon'; 
+import UpperFloor from './UpperFloor';
+import LowerFloor from './LowerFloor';
+import EnemyObj from '../gameObject/EnemyObj';
+import PlayerObj from '../gameObject/PlayerObj';
+import QuestionBox from './QuestionBox';
+import AnswerChoice from './AnswerChoice';
+import StatusBar from './StatusBar';
+import ProgressBar from './ProgressBar';
+import ResultPanel from './ResultPanel';
+import {MyInGameStor} from '../gameData/InGameStorage'; 
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
+
+
+
+
+
+
+const ingameBattle = (props) =>{
+
+
+    //mobile device back btn prevent
+    // useEffect(() => {
+    //     const backAction = () => {
+        
+    //      Alert.alert(
+    //         "In-Game",
+    //         "You're In-Game"
+    //      )
+    //       return true; // Return true to prevent default back button behavior
+    //     };
+    
+    //     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+    //     return () => backHandler.remove(); // Clean up the event listener on unmount
+    //   }, []);
+
+        const {showResults,setshowResults}=useContext(MyInGameStor);
+
+        //animation ewan
+
+          // State for the countdown number
+  const [countdown, setCountdown] = useState(3); // Start from 3
+  // State to control the visibility of the main content view
+  const [showMainContent, setShowMainContent] = useState(false);
+
+  // Animated value for the current countdown number's animation (scale and opacity)
+  const numberAnim = useRef(new Animated.Value(0)).current; // 0 for initial scale/opacity
+
+        useEffect(() => {
+    // This effect runs whenever the 'countdown' state changes
+    if (countdown > 0) {
+      // Reset animation value for the new number
+      numberAnim.setValue(0);
+
+      // Sequence of animations for each number:
+      // 1. Scale up and fade in (appear)
+      // 2. Wait for a moment
+      // 3. Scale down and fade out (disappear)
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(numberAnim, {
+            toValue: 1, // Scale to 1 (normal size) and opacity to 1 (fully visible)
+            duration: 400, // Fast appearance
+            easing: Easing.easeOutBack, // A nice bouncy easing for scale
+            useNativeDriver: true,
+          }),
+          Animated.timing(numberAnim, {
+            toValue: 1, // Opacity to 1
+            duration: 200, // Faster opacity fade in
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.delay(500), // Hold the number for a bit
+        Animated.parallel([
+          Animated.timing(numberAnim, {
+            toValue: 0, // Scale back to 0 (disappear)
+            duration: 300, // Fast disappearance
+            easing: Easing.easeInBack, // Bouncy easing for scale out
+            useNativeDriver: true,
+          }),
+          Animated.timing(numberAnim, {
+            toValue: 0, // Opacity back to 0
+            duration: 300, // Faster opacity fade out
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => {
+        // After the current number's animation sequence completes,
+        // decrement the countdown. This triggers the effect again for the next number.
+        setCountdown(prevCount => prevCount - 1);
+      });
+    } else if (countdown === 0) {
+      // Once countdown reaches 0, fade in the main content
+      setShowMainContent(true);
+    }
+  }, [countdown, numberAnim]); // Depend on countdown to re-trigger the animation logic
+
+  // Animated style for the countdown number
+  const countdownNumberStyle = {
+    opacity: numberAnim.interpolate({
+      inputRange: [0, 0.5, 1], // Opacity points
+      outputRange: [0, 0.5, 1], // Values corresponding to inputRange
+      extrapolate: 'clamp',
+    }),
+    transform: [
+      {
+        scale: numberAnim.interpolate({
+          inputRange: [0, 0.5, 1],
+          outputRange: [0.5, 1.2, 1], // Scale from smaller, slightly overshoot, then settle
+          extrapolate: 'clamp',
+        }),
+      },
+    ],
+  };
+
+  // Animated value for the main content's fade-in
+  const mainContentOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (showMainContent) {
+      Animated.timing(mainContentOpacity, {
+        toValue: 1,
+        duration: 800, // Smooth fade-in duration
+        useNativeDriver: true,
+        easing: Easing.ease,
+      }).start();
+    }
+  }, [showMainContent, mainContentOpacity]);
+
+  if (!showMainContent) {
+    // Render the countdown animation
+    return (
+     <View style={styles.countdownContainer}>
+<View style={styles.countdownsubContainer}>
+        {countdown > 0 ? (
+          <Animated.Text style={[styles.countdownText, countdownNumberStyle]}>
+            {countdown}
+          </Animated.Text>
+        ) : (
+          // You could show "Go!" or nothing here briefly
+          <Text style={[styles.countdownText,{fontSize:50}]}>LETS LEARN</Text> // Or another animation
+        )}
+</View>
+      </View>
+    );
+  }
+else{
+    return(
+
+        <>
+    
+        
+        <View style = {styles.container}>
+ 
+        <ImageBackground
+        style = {styles.bgcon}
+        source={{uri:'https://img.freepik.com/free-vector/school-building-scene_1308-29938.jpg?ga=GA1.1.1339217056.1740616814&semt=ais_hybrid&w=740'}}
+        >
+
+        { showResults ? <ResultPanel/> : ''}  
+       
+        <View style = {styles.progbar}><ProgressBar/></View>
+
+        <QuestionBox/>
+
+
+
+      <View style = {styles.playercon}>
+        <PlayerObj/>
+        <EnemyObj/>
+      </View>
+
+       
+        <View style = {styles.floor}>  
+
+         <View style = {styles.upfloorrepo}><UpperFloor/></View>
+       
+         <View style = {styles.downfloorrepo}>
+         <LowerFloor/>
+     
+         <View style = {styles.answercon}>
+      
+        <View style = {styles.anschoice}> <AnswerChoice/> </View> 
+        </View>
+
+         </View>
+
+         </View>
+
+
+
+
+
+        </ImageBackground>
+
+       
+
+        </View>
+
+        </>
+    );
+
+}};
+
+const styles = StyleSheet.create({
+    container:{
+        flex: 1,
+        backgroundColor: '#fff',
+        // alignItems: 'center',
+        // justifyContent: 'center',
+        backgroundColor:'darkblue',
+        flex:1
+
+    },
+
+    bgcon:{
+        width:'100%',
+        height:'100%'
+    },
+    floor:{
+        top:hp('48%'),
+        width:'auto',
+        height:'auto'
+    },
+    pausebtn:{
+        width:wp('8%'),
+        height:hp('5%'),
+        position:'absolute',
+        top:wp('5%'),
+        left:hp('43%')
+    },
+    upfloorrepo:{
+
+        alignItems:'center'
+        
+    },
+
+    downfloorrepo:{
+
+        alignItems:'center',
+        RowGap:0,
+        
+        
+        
+    },
+    anschoice:{
+
+        width:'100%',
+        height:300,
+        // top:hp('2%'),
+        left:wp('5%'),
+        alignItems:'center'
+      
+    },
+    statbardes:{
+        width:'100%',
+        height:'auto',
+        bottom:hp('101%'),
+        position:'absolute',
+        alignItems:'center',
+        zIndex:0
+    },
+    progbar:{
+        top:hp('2%'),
+        left:wp('8%')
+    },
+    answercon:{
+        width:wp('90%'),
+        height:hp('33%'),
+        // borderWidth:2,
+        bottom:hp('14%'),
+        // rowGap:20
+    },
+    playercon:{
+        width:wp('100%'),
+        height:hp('12%'),
+        // borderWidth:2,
+        position:'absolute',
+        flexDirection:'row',
+        rowGap:15,
+        top:hp('36%')
+    },
+
+
+     countdownContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4483E4', // Dark background for contrast
+  },
+  
+     countdownsubContainer: {
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    width:wp('100%'),
+    height:hp('30%'),
+    backgroundColor: 'darkblue', // Dark background for contrast
+  },
+  countdownText: {
+    fontSize: 120,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 10,
+  },
+  mainContentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ecf0f1', // Light background for main content
+    padding: 20,
+  },
+  mainContentText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#34495e',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+ 
+})
+
+export default memo(ingameBattle);

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "197910161415",
+    "project_id": "learneng-4cb6e",
+    "storage_bucket": "learneng-4cb6e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197910161415:android:d0d6e0e34b648a2adde2a2",
+        "android_client_info": {
+          "package_name": "com.learneng_native"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKD0alPJbR9NRceVAzycXX0ySi3-xyW4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

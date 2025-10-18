@@ -1,0 +1,235 @@
+import {Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, { useRef,useContext, useState , useEffect} from 'react';
+import { useNavigation,useRoute } from '@react-navigation/native';
+// import {MyStorage} from './StorageCon'; 
+import {MyInGameStor} from '../gameData/InGameStorage'; 
+import axios from 'axios';
+// import { useNavigation } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
+const ResultPanel = () =>{
+
+    const navigation = useNavigation();
+
+    const [nextpanel,setnextpanel]=useState(0)
+
+
+    //in-
+      const {ingameQues,setingameQues}=useContext(MyInGameStor)
+        const {quesCount,setquesCount}=useContext(MyInGameStor)
+        const {ingameAns,setingameAns}=useContext(MyInGameStor);
+        const {ansActModule,setansActModule}=useContext(MyInGameStor)
+        const {igCount,setigCount}=useContext(MyInGameStor);
+
+   //   //practice enabled?
+      const {inPractice,setinPractice}=useContext(MyInGameStor)
+    
+            const {showResults,setshowResults}=useContext(MyInGameStor);
+
+              //right and wrong counter context
+            
+                   
+                  const {rightAnsscr,setrightAnsscr}=useContext(MyInGameStor);
+                  const {wrongAnsscr,setwrongAnsscr}=useContext(MyInGameStor);
+
+                  //overall percentage
+                  const [overallPercentage,setoverallPercentage]=useState(0)
+        useEffect(()=>{
+            const rightScore = rightAnsscr
+            const total = quesCount
+
+            setoverallPercentage(Math.round((rightScore/total)*100))
+         },[])
+            //functions
+
+            const closeResult = () =>{
+
+              
+
+                if(nextpanel === 1){
+                setshowResults(false)
+                setingameAns([])
+                setingameQues({})
+                setquesCount(0)
+                setigCount(0)
+                setansActModule(0)
+                setrightAnsscr(0)
+                setwrongAnsscr(0)
+
+                if(inPractice === false){
+                navigation.navigate('categorieschoose')
+              }
+              else{
+                  navigation.navigate('mainscreen')
+                  setinPractice(false)
+              }
+            }
+              setnextpanel(1)
+            }
+
+            // Example data – replace this with your Firestore data
+  const leaderboardData = [
+    { id: '1', name: 'Alice', coins: 120 },
+    { id: '2', name: 'Bob', coins: 100 },
+    { id: '3', name: 'Charlie', coins: 90 },
+    { id: '4', name: 'David', coins: 75 },
+    { id: '5', name: 'Ella', coins: 50 },
+  ];
+
+    return(
+        <>
+       
+
+       {/* shadowbox */}
+        <Pressable onPress={closeResult} style = {styles.shadowrescon}></Pressable> 
+
+        <Text style = {styles.resultlbl}>RESULTS</Text>
+
+{nextpanel === 0 ?
+<>
+    <View style = {styles.respanel1ver1}
+    >
+    <View style = {{width:wp('60%'),height:hp('10%'),backgroundColor:'lightgreen',borderWidth:2,borderColor:'blue',borderRadius:20,alignItems:'center'}}>
+<Text style = {{color:'blue',fontSize:40,fontWeight:'700'}}>Correct:<Text>{rightAnsscr}</Text></Text>
+    </View>
+    
+    <View style = {{width:wp('60%'),height:hp('10%'),backgroundColor:'lightgreen',borderWidth:2,borderColor:'blue',borderRadius:20,alignItems:'center'}}>
+    <Text style = {{color:'red',fontSize:40,fontWeight:'700'}}> Wrong:<Text>{wrongAnsscr}</Text></Text>
+    </View>
+    
+    </View>
+    <View style = {styles.complimentcon}><Text style = {styles.complimentnote}>Good job</Text></View>
+    <View style = {styles.respanel1ver2}>
+        <Text style = {{color:'blue',fontSize:30,fontWeight:'bold'}}>Test Grade:</Text>
+        <Text style = {{color:'blue',fontSize:40,fontWeight:'bold'}}>{overallPercentage}%</Text>
+    </View>
+    </>
+    :
+   <View style = {[styles.respanel1ver1,{width:wp('75%'),height:hp('40%'),marginRight:wp('12%')}]}>
+   <Text style = {{fontSize:30}}>Ranking</Text>
+    <FlatList
+        data={leaderboardData}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => (
+          <View style={styles.rankItem}>
+            <Text style={styles.rank}>{index + 1}.</Text>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.coins}>{item.coins} 🪙</Text>
+          </View>
+      
+        )}
+      />
+       </View>
+}
+   
+        </>
+    );
+};
+
+const styles = StyleSheet.create({
+
+    shadowrescon:{
+        width:wp('100%'),
+        height:hp('100%'),
+        backgroundColor:'black',
+        opacity:0.7,
+        zIndex:1,
+        position:'absolute'
+    },
+    respanel1ver1:{
+        width:wp('69%'),
+        height:hp('24%'),
+        backgroundColor:'lightblue',
+        opacity:1,
+        position:'absolute',
+        left:hp('8%'),
+        top:wp('40%'),
+        alignItems:'center',
+        padding:10,
+        // transform: [{rotateZ: '0deg'},{rotateY: '-30deg'} ],
+        zIndex:2,
+        rowGap:20
+    },
+    respanel1ver2:{
+        width:wp('69%'),
+        height:hp('24%'),
+        backgroundColor:'lightblue',
+        opacity:1,
+        position:'absolute',
+        left:hp('8%'),
+        top:wp('120%'),
+        // transform: [{rotateZ: '0deg'},{rotateY: '30deg'} ],
+        zIndex:1,
+        alignItems:'center',
+        rowGap:30
+    },
+
+    resultlbl:{
+
+        position:'absolute',
+        zIndex:1,
+        color:'yellow',
+        fontSize:35,
+        fontWeight:'900',
+        left:wp('30%'),
+        top:hp('3%')
+
+    },
+    complimentcon:{
+        width:wp('100%'),
+        height:hp('10%'),
+        // borderWidth:2,
+        position:'absolute',
+        zIndex:2,
+         top:hp('48%'),
+         alignContent:'center',
+         alignItems:'center'
+
+
+    },
+    complimentnote:{
+        fontSize:40,
+        color:'white',
+        fontWeight:'bold',
+        // top:hp('48%'),
+        // left:wp('25%')
+    },
+      title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  rankItem: {
+    flexDirection: 'row',
+    // position:'absolute',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 10,
+    // top:100,
+    width:wp('70%'),
+    //  zIndex:9,
+    elevation: 2,
+  },
+  rank: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    width: 30,
+  },
+  name: {
+    flex: 1,
+    fontSize: 18,
+  },
+  coins: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+  
+
+});
+
+export default ResultPanel;

@@ -1,0 +1,81 @@
+import {Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, { useCallback,memo,createContext,useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+const StatusBar = () =>{
+
+    return(
+        <>
+
+        <View style = {styles.statusCon}>
+
+        <View style = {styles.infocon}>
+        <Image style = {styles.medalimg} source={require('../assets/samplemedal.jpg')}/>
+           <View style = {styles.Titlenamecon}>
+            <Text style = {styles.textstyle}>Addictedmark69</Text>
+            <Text style = {styles.titlestyle}>English Speaker</Text>
+           </View>
+           </View>
+           <Text style = {{fontSize:30,fontWeight:'bold',color:'yellow'}}>||</Text>
+            <View style = {styles.infocon}>
+           <View style = {styles.Titlenamecon}>
+            <Text style = {styles.textstyle}>Mr Pants Guy</Text>
+            <Text style = {styles.titlestyle}>Bot</Text>
+           </View>
+           <Image style = {styles.medalimg} source={require('../assets/samplemedal.jpg')}/>
+           </View>
+
+        </View>
+
+        </>
+    );
+};
+
+
+const styles = StyleSheet.create({
+
+    statusCon:{
+        width:wp('93%'),
+        height:hp('9%'),
+        position:'absolute',
+        backgroundColor:'#342f71',
+        borderBottomColor:'white',
+        flexDirection:'row',
+        alignItems:'center',
+        top:hp('2%')
+        
+
+    },
+    textstyle:{
+        color:'white',
+        fontSize:wp('3.7%'),
+        fontFamily:'Roboto',
+        fontWeight:'bold'
+     
+    },
+    Titlenamecon:{
+        width:wp('30%'),
+        height:hp('8%'),
+        // borderWidth:2
+    },
+    titlestyle:{
+         color:'white',
+        fontSize:wp('3.4%'),
+    },
+    infocon:{
+        width:wp('auto'),
+        height:hp('8%'),
+        flexDirection:'row',
+        // borderWidth:2,
+        alignContent:'center',
+        alignItems:'center',
+        columnGap:10
+    },
+    medalimg:{
+        width:50,
+        height:50
+    }
+ 
+})
+
+export default memo(StatusBar)

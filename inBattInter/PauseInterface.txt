@@ -1,0 +1,16 @@
+import {Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, { useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+import {MyStorage} from './StorageCon'; 
+
+
+const PauseInterface = ()=>{
+    return(
+        <>
+
+        </>
+    )
+}
+
+export default PauseInterface;
+

@@ -1,0 +1,162 @@
+
+
+// // services/ttsService.js
+// import RNFS from 'react-native-fs';
+// import { Platform, Alert } from 'react-native';
+
+// class TTSService {
+//   constructor() {
+//     this.apiKey = 'AIzaSyCIUn3smyK7ASZNPWzmpDvqwtQIBGkFEZw';
+//     this.baseUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+//   }
+
+//   async synthesizeSpeech(text, options = {}) {
+//     const {
+//       languageCode = 'en-US',
+//       voiceName = 'en-US-Wavenet-D',
+//       ssmlGender = 'NEUTRAL',
+//       audioEncoding = 'MP3'
+//     } = options;
+
+//     try {
+//       console.log('Synthesizing speech for:', text);
+      
+//       const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           input: { text },
+//           voice: {
+//             languageCode,
+//             name: voiceName,
+//             ssmlGender
+//           },
+//           audioConfig: {
+//             audioEncoding
+//           }
+//         })
+//       });
+
+//       console.log('Response status:', response.status);
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+
+//       const data = await response.json();
+//       console.log('Response data keys:', Object.keys(data));
+      
+//       if (data.error) {
+//         throw new Error(`API Error: ${data.error.message}`);
+//       }
+      
+//       if (!data.audioContent) {
+//         throw new Error('No audio content received from API');
+//       }
+
+//       console.log('Audio content length:', data.audioContent.length);
+//       return data.audioContent;
+      
+//     } catch (error) {
+//       console.error('TTS Error:', error);
+//       throw error;
+//     }
+//   }
+
+//   async saveAndPlayAudio(base64Audio) {
+//     try {
+//       // Validate input
+//       if (!base64Audio || typeof base64Audio !== 'string') {
+//         throw new Error(`Invalid audio data: ${typeof base64Audio}`);
+//       }
+
+//       if (base64Audio.length < 100) {
+//         throw new Error(`Audio data too short: ${base64Audio.length} characters`);
+//       }
+
+//       console.log('Saving audio, length:', base64Audio.length);
+      
+//       const fileName = `tts_${Date.now()}.mp3`;
+//       const filePath = Platform.OS === 'ios' 
+//         ? `${RNFS.DocumentDirectoryPath}/${fileName}`
+//         : `${RNFS.CachesDirectoryPath}/${fileName}`;
+      
+//       console.log('File path:', filePath);
+      
+//       // Ensure directory exists
+//       const dirPath = Platform.OS === 'ios' 
+//         ? RNFS.DocumentDirectoryPath
+//         : RNFS.CachesDirectoryPath;
+        
+//       const dirExists = await RNFS.exists(dirPath);
+//       if (!dirExists) {
+//         await RNFS.mkdir(dirPath);
+//       }
+      
+//       // Write base64 data to file
+//       await RNFS.writeFile(filePath, base64Audio, 'base64');
+      
+//       console.log('File written successfully');
+      
+//       // Verify file was created
+//       const fileExists = await RNFS.exists(filePath);
+//       if (!fileExists) {
+//         throw new Error('File was not created successfully');
+//       }
+      
+//       const fileStats = await RNFS.stat(filePath);
+//       console.log('File size:', fileStats.size);
+      
+//       if (fileStats.size < 1000) {
+//         throw new Error('Generated file is too small, likely corrupted');
+//       }
+      
+//       // Show success message instead of trying to play
+//       Alert.alert(
+//         'Audio Generated', 
+//         `Audio file saved to: ${fileName}\nFile size: ${Math.round(fileStats.size / 1024)}KB`,
+//         [
+//           {
+//             text: 'OK',
+//             onPress: () => {
+//               // Clean up after user acknowledges
+//               setTimeout(() => {
+//                 RNFS.unlink(filePath).catch(console.error);
+//               }, 5000);
+//             }
+//           }
+//         ]
+//       );
+      
+//     } catch (error) {
+//       console.error('Save and play audio error:', error);
+//       Alert.alert('Error', error.message);
+//       throw error;
+//     }
+//   }
+
+//   async speakText(text, options = {}) {
+//     try {
+//       if (!text || text.trim().length === 0) {
+//         throw new Error('Text is required');
+//       }
+
+//       if (!this.apiKey || this.apiKey === 'AIzaSyCIUn3smyK7ASZNPWzmpDvqwtQIBGkFEZw') {
+//         throw new Error('Please set your Google Cloud API key');
+//       }
+
+//       console.log('Starting TTS for:', text);
+//       const audioContent = await this.synthesizeSpeech(text, options);
+//       await this.saveAndPlayAudio(audioContent);
+      
+//     } catch (error) {
+//       console.error('Speak text error:', error);
+//       Alert.alert('TTS Error', error.message);
+//       throw error;
+//     }
+//   }
+// }
+
+// export default new TTSService();

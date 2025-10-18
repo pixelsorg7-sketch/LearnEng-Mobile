@@ -1,0 +1,45 @@
+import {Switch,ImageBackground,TouchableWithoutFeedback,Image,Animated,ActivityIndicator,Modal,Dimensions,ScrollView,TouchableOpacity,RadioButton, Alert,Text, SafeAreaView, StyleSheet,TextInput,Pressable,FlatList,Button, View } from 'react-native';
+import React, { createContext,useRef,useContext, useState , useEffect} from 'react';
+import { useRoute } from '@react-navigation/native';
+import {MyStorage} from './StorageCon'; 
+import * as Progress from 'react-native-progress';
+import {MyInGameStor} from '../gameData/InGameStorage'; 
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
+const ProgressBar = () =>{
+
+  
+
+    const {igCount,setigCount}=useContext(MyInGameStor); 
+    const {quesCount,setquesCount}=useContext(MyInGameStor);
+
+ 
+  const progressBarvalue = igCount/quesCount
+  const progressColor = progressBarvalue > 0.5 ? 'lightgreen' : 'red'
+    return(
+
+        <>
+
+        <View style = {styles.progressCon}> 
+        <Text style = {{fontSize:20}}>Question/s: {igCount + 1}/{quesCount}</Text>
+        <Progress.Bar progress={progressBarvalue} width={250} height={20} color={progressColor} />
+        </View>
+
+        </>
+    );
+};
+
+const styles = StyleSheet.create({
+    progressCon:{
+        position:'absolute',
+        width:wp("82%"),
+        height:50,
+        alignContent:'center',
+        alignItems:'center',
+        backgroundColor:'teal'
+
+    }
+
+})
+
+export default ProgressBar;
